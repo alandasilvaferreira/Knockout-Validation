@@ -36,6 +36,17 @@ ko.applyBindings = function (viewModel, rootNode) {
 	origApplyBindings(viewModel, rootNode);
 };
 
+var origApplyExtenders = ko.subscribable.fn.extend;
+ko.subscribable.fn.extend = function(requestedExtenders) {
+	if (origApplyExtenders) {
+		ko.validation.init();
+
+		ko.subscribable.fn.extend = origApplyExtenders;
+		origApplyExtenders = undefined;
+		return ko.subscribable.fn.extend.apply(this, arguments);
+	}
+};
+
 ko.validatedObservable = function (initialValue, options) {
 	if (!options && !ko.validation.utils.isObject(initialValue)) {
 		return ko.observable(initialValue).extend({ validatable: true });
